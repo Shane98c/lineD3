@@ -40,11 +40,11 @@
     const path = d3.geoPath().projection(projection);
 
     const gSpreads = svg.append("g");
-    const gMap = svg.append("g");
+    const gMN = svg.append("g");
     const gL3 = svg.append("g");
 
     const addBaseLayers = (geoData) => {
-      gMap
+      gMN
         .selectAll("path")
         .data(
           topojson.feature(geoData[0], geoData[0].objects.collection).features
