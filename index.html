@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <meta charset="utf-8" />
 <style>
-  .MNBdy {
+  #map {
+    width: 100vw;
+    height: 100vh;
+  }
+  .MN {
     fill: none;
     stroke: black;
   }
@@ -16,25 +20,40 @@
   }
 </style>
 <body>
+  <div id="map"></div>
   <script src="//d3js.org/d3.v6.min.js" charset="utf-8"></script>
-  <!-- <script src="//d3js.org/topojson.v1.js"></script> -->
   <script src="https://unpkg.com/topojson@3"></script>
   <script>
-    const width = 960,
-      height = 1160;
+    const width = parseInt(d3.select("#map").style("width"));
+    const height = parseInt(d3.select("#map").style("height"));
+
+    const resize = () => {
+      const width = parseInt(d3.select("#map").style("width"));
+      const height = parseInt(d3.select("#map").style("height"));
+
+      projection.translate([width / 2, height / 2]).scale(width * 3);
+
+      svg.style("width", width + "px").style("height", height + "px");
+
+      svg.selectAll(".l3").attr("d", path);
+      svg.selectAll(".MN").attr("d", path);
+      svg.selectAll(".spreads").attr("d", path);
+    };
+
+    d3.select(window).on("resize", resize);
 
     const svg = d3
-      .select("body")
+      .select("#map")
       .append("svg")
-      .attr("width", width)
-      .attr("height", height);
+      .style("height", height + "px")
+      .style("width", width + "px");
 
     const projection = d3
       .geoAlbers()
       .center([0, 46.7])
       .rotate([94.6, 0])
       .parallels([43.4, 50])
-      .scale(6000)
+      .scale(width * 3)
       .translate([width / 2, height / 2]);
 
     const path = d3.geoPath().projection(projection);
@@ -51,7 +70,7 @@
         )
         .enter()
         .append("path")
-        .attr("class", "MNBdy")
+        .attr("class", "MN")
         .attr("d", path);
 
       gL3
