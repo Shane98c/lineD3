@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style>
+  .MNBdy {
+    fill: none;
+    stroke: black;
+  }
+  .l3 {
+    fill: none;
+    stroke: red;
+    stroke-width: 3;
+  }
+  .spreads {
+    fill: none;
+    stroke: black;
+  }
+</style>
+<body>
+  <script src="//d3js.org/d3.v6.min.js" charset="utf-8"></script>
+  <!-- <script src="//d3js.org/topojson.v1.js"></script> -->
+  <script src="https://unpkg.com/topojson@3"></script>
+  <script>
+    var width = 960,
+      height = 1160;
+
+    var svg = d3
+      .select("body")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    var projection = d3
+      .geoAlbers()
+      .center([0, 46.7])
+      .rotate([94.6, 0])
+      .parallels([43.4, 50])
+      .scale(6000)
+      .translate([width / 2, height / 2]);
+
+    var path = d3.geoPath().projection(projection);
+
+    var gSpreads = svg.append("g");
+    var gMap = svg.append("g");
+    var gL3 = svg.append("g");
+
+    function addBaseLayers(geoData) {
+      gMap
+        .selectAll("path")
+        .data(
+          topojson.feature(geoData[0], geoData[0].objects.collection).features
+        )
+        .enter()
+        .append("path")
+        .attr("class", "MNBdy")
+        .attr("d", path);
+
+      gL3
+        .selectAll("path")
+        .data(
+          topojson.feature(geoData[1], geoData[1].objects.L3PermRoute).features
+        )
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("class", "l3");
+
+      gSpreads
+        .selectAll("path")
+        .data(topojson.feature(geoData[2], geoData[2].objects.Spreads).features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("class", "spreads");
+    }
+
+    Promise.all([
+      d3.json("MN.json"),
+      d3.json("L3PermRoute.json"),
+      d3.json("spreads.json"),
+    ])
+      .then(function (geoData) {
+        addBaseLayers(geoData);
+      })
+      .catch(function (err) {
+        console.error(err);
+      });
+
+    // d3.json("MN.json").then(function (mn) {
+    //   g.data(topojson.feature(mn, mn.objects.collection).features)
+    //     .enter()
+    //     .append("path")
+    //     .attr("class", "MNBdy")
+    //     .attr("d", path);
+    // });
+
+    // d3.json("L3PermRoute.json").then(function (l3) {
+    //   console.log(l3);
+    //   g.data(topojson.feature(l3, l3.objects.L3PermRoute).features)
+    //     .enter()
+    //     .append("path")
+    //     .attr("class", "l3")
+    //     .attr("d", path);
+    // });
+
+    // d3.json("spreads.json").then(function (spreads) {
+    //   svg
+    //     .append("path")
+    //     .data(topojson.feature(spreads, spreads.objects.Spreads))
+    //     .attr("class", "spreads")
+    //     .attr("d", path);
+    // });
+  </script>
+</body>
